@@ -1,14 +1,11 @@
 fn main() {
-    println!(
-        "{:?}",
-        brain_luck(",>,<[>[->+>+<<]>>[-<<+>>]<<<-]>>.", vec![3, 2])
-    );
+    println!("{:?}", brain_luck(",>,< [ > [ >+ >+ << -] >> [- << + >>] <<< -] >>.", vec![8, 5]));
 }
 
 fn brain_luck(code: &str, input: Vec<u8>) -> Vec<u8> {
-    let mut token = 0;
-    let mut ptr = 0;
+    let mut i = 0;
     let mut io_ptr = 0;
+    let mut stack_ptr = 0;
 
     let mut jmp = false;
 
@@ -17,76 +14,84 @@ fn brain_luck(code: &str, input: Vec<u8>) -> Vec<u8> {
     let mut output: Vec<u8> = vec![];
 
     loop {
-        if let Some(op) = code.chars().nth(token) {
+        if let Some(op) = code.chars().nth(i) {
 
+            // jump until
             if jmp {
-                println!("-> {}:{}", token, op);
+                println!("SKIPPED -> {}:{}", i, op);
+
                 if op == ']' {
                     jmp = false;
                 }
 
-                token += 1;
+                i += 1;
                 continue;
             }
 
-            println!("{}:{}", token, op);
+            println!("{}:{}", i, op);
 
             match op {
                 '[' => {
-                    if stack[ptr] == 0 {
-                        jumps.pop();
+                    // jump wihtout executing between
+                    if stack[stack_ptr] == 0 {
                         jmp = true;
                     } else {
-                        jumps.push(token);
+                        // set jump target
+                        jumps.push(i);
                     }
                 }
                 ']' => {
-                    if stack[ptr] != 0 {
-                        token = jumps[jumps.len() - 1] - 1;
+                    jmp = false;
+
+                    if stack[stack_ptr] == 0 {
+                        // no need to return remove last jump
+                        jumps.pop();
                     } else {
+                        // return to last jump
+                        i = jumps[jumps.len() - 1] - 1;
                         jumps.pop();
                     }
                 }
                 '.' => {
-                    output.push(stack[ptr]);
-                    println!("PUT ->> {}", stack[ptr]);
+                    output.push(stack[stack_ptr]);
+                    println!("\tPUT ->> {}", stack[stack_ptr]);
                 }
                 ',' => {
-                    println!("GET ->> {}", input[io_ptr]);
+                    println!("\tGET ->> {}", input[io_ptr]);
 
-                    stack[ptr] = input[io_ptr];
+                    stack[stack_ptr] = input[io_ptr];
                     io_ptr += 1;
                 }
                 '+' => {
-                    if stack[ptr] != 255 {
-                        stack[ptr] += 1;
+                    if stack[stack_ptr] != 255 {
+                        stack[stack_ptr] += 1;
                     } else {
-                        stack[ptr] = 0;
+                        stack[stack_ptr] = 0;
                     }
                 }
                 '-' => {
-                    if stack[ptr] != 0 {
-                        stack[ptr] -= 1;
+                    if stack[stack_ptr] != 0 {
+                        stack[stack_ptr] -= 1;
                     } else {
-                        stack[ptr] = 255;
+                        stack[stack_ptr] = 255;
                     }
                 }
                 '>' => {
-                    ptr += 1;
+                    stack_ptr += 1;
 
-                    if stack.len() <= ptr {
+                    // extend stack if needed
+                    if stack.len() <= stack_ptr {
                         stack.push(0);
                     }
                 }
                 '<' => {
-                    ptr -= 1;
+                    stack_ptr -= 1;
                 }
                 _ => {
-                    break;
                 }
             }
 
-            token += 1;
+            i += 1;
         } else {
             break;
         }
@@ -96,14 +101,22 @@ fn brain_luck(code: &str, input: Vec<u8>) -> Vec<u8> {
 }
 
 #[test]
+fn read_until_zero() {
+    assert_eq!(brain_luck(",[.[-],]", vec![1, 1, 1, 0]),  vec![1, 1, 1]);
+}
+#[test]
+fn read_until_255() {
+    assert_eq!(brain_luck(",+[-.,+]", vec![1, 1, 1, 255]),  vec![1, 1, 1]);
+}
+#[test]
+fn a() {
+    assert_eq!(brain_luck("++++++ [ > ++++++++++ < - ] > +++++ .", vec![]),  vec![65]);
+}
+#[test]
 fn subtract() {
     assert_eq!(brain_luck(",>,[-<->]<.", vec![4, 3]),  vec![1]);
 }
 #[test]
-fn ready_until_zero() {
-    assert_eq!(brain_luck(",[.[-],]", vec![1, 1, 1, 0]),  vec![1, 1, 1]);
-}
-#[test]
-fn ready_until_255() {
-    assert_eq!(brain_luck(",+[-.,+]", vec![1, 1, 1, 255]),  vec![1, 1, 1]);
+fn multiply() {
+    assert_eq!(brain_luck(",>,< [ > [ >+ >+ << -] >> [- << + >>] <<< -] >>", vec![8, 3]),  vec![24]);
 }
