@@ -15,11 +15,8 @@ fn brain_luck(code: &str, input: Vec<u8>) -> Vec<u8> {
 
     loop {
         if let Some(op) = code.chars().nth(i) {
-
             // jump until
             if jmp {
-                println!("SKIPPED -> {}:{}", i, op);
-
                 if op == ']' {
                     jmp = false;
                 }
@@ -27,9 +24,7 @@ fn brain_luck(code: &str, input: Vec<u8>) -> Vec<u8> {
                 i += 1;
                 continue;
             }
-
-            println!("{}:{}", i, op);
-
+            
             match op {
                 '[' => {
                     // jump wihtout executing between
@@ -54,11 +49,8 @@ fn brain_luck(code: &str, input: Vec<u8>) -> Vec<u8> {
                 }
                 '.' => {
                     output.push(stack[stack_ptr]);
-                    println!("\tPUT ->> {}", stack[stack_ptr]);
                 }
                 ',' => {
-                    println!("\tGET ->> {}", input[io_ptr]);
-
                     stack[stack_ptr] = input[io_ptr];
                     io_ptr += 1;
                 }
