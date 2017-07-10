@@ -1,9 +1,5 @@
 fn main() {}
 
-// advance_tests panics with nowhere to jump ?????
-// multiply_tests overflow
-
-
 fn brain_luck(code: &str, input: Vec<u8>) -> Vec<u8> {
     let mut i = 0;
     let mut stack_ptr = 0;
@@ -102,11 +98,11 @@ fn brain_luck(code: &str, input: Vec<u8>) -> Vec<u8> {
 
 #[test]
 fn read_until_zero() {
-    assert_eq!(brain_luck(",[.[-],]", vec![1, 1, 1, 0]), vec![1, 1, 1]);
+    assert_eq!(brain_luck(",[.[-],]", vec![1, 2, 3, 0]), vec![1, 2, 3]);
 }
 #[test]
 fn read_until_255() {
-    assert_eq!(brain_luck(",+[-.,+]", vec![1, 1, 1, 255]), vec![1, 1, 1]);
+    assert_eq!(brain_luck(",+[-.,+]", vec![1, 2, 3, 255]), vec![1, 2, 3]);
 }
 #[test]
 fn print_a() {
@@ -133,8 +129,7 @@ fn multiply() {
 fn hello_world() {
     assert_eq!(
         brain_luck(
-            "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]
-            >>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.",
+            "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.",
             vec![],
         ),
         "Hello World!\n".as_bytes()
@@ -145,20 +140,9 @@ fn hello_world() {
 fn division() {
     assert_eq!(
         brain_luck(
-            "
-,>,>++++++[-<--------<-------->>]
-<<[
->[->+>+<<]
->[-<<-
-[>]>>>[<[>>>-<<<[-]]>>]<<]
->>>+
-<<[-<<+>>]
-<<<]
->[-]>>>>[-<<<<<+>>>>>]
-<<<<++++++[-<++++++++>]<.
-",
-            vec![2, 1],
-        ),
-        vec![2]
+            ",>,<[>[->+>+<<]>[-<<-[>]>>>[<[-<->]<[>]>>[[-]>>+<]>-<]<<]>>>+<<[-<<+>>]<<<]>>>>>[-<<<<<+>>>>>]<<<<<.",
+            vec![10, 2],
+        )[0],
+        10/2
     );
 }
