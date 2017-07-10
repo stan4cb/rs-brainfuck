@@ -2,25 +2,34 @@ fn main() {
     println!(
         "{:?}",
         brain_luck(
-            ",>,< [ > [ >+ >+ << -] >> [- << + >>] <<< -] >>.",
-            vec![8, 9]
+            ",>+>>>>++++++++++++++++++++++++++++++++++++++++++++>++++++++++++++++++++++++++++++++<<<<<<[>[>>>>>>+>+<<<<<<<-]>>>>>>>[<<<<<<<+>>>>>>>-]<[>++++++++++[-<-[>>+>+<<<-]>>>[<<<+>>>-]+<[>[-]<[-]]>[<<[>>>+<<<-]>>[-]]<<]>>>[>>+>+<<<-]>>>[<<<+>>>-]+<[>[-]<[-]]>[<<+>>[-]]<<<<<<<]>>>>>[++++++++++++++++++++++++++++++++++++++++++++++++.[-]]++++++++++<[->-<]>++++++++++++++++++++++++++++++++++++++++++++++++.[-]<<<<<<<<<<<<[>>>+>+<<<<-]>>>>[<<<<+>>>>-]<-[>>.>.<<<[-]]<<[>>+>+<<<-]>>>[<<<+>>>-]<<[<+>-]>[<+>-]<<<-]",
+            vec![2]
         )
     );
 }
 
+// advance_tests panics with nowhere to jump ?????
+// multiply_tests overflow
+
+
 fn brain_luck(code: &str, input: Vec<u8>) -> Vec<u8> {
     let mut i = 0;
     let mut stack_ptr = 0;
+    let mut stack_ptri : i32 = 0;
 
     let mut jmp = false;
 
     let mut jumps = vec![];
     let mut stack: Vec<u8> = vec![0];
+    let mut nstack: Vec<u8> = vec![0];
     let mut output: Vec<u8> = vec![];
     let mut params = input.into_iter();
 
     loop {
         if let Some(op) = code.chars().nth(i) {
+
+            let t_stack = select_stack(&mut nstack, &mut stack, stack_ptri);
+
             // jump until
             if jmp {
                 // end jump
@@ -32,7 +41,7 @@ fn brain_luck(code: &str, input: Vec<u8>) -> Vec<u8> {
                 match op {
                     '[' => {
                         // jump wihtout executing between
-                        if stack[stack_ptr] == 0 {
+                        if t_stack[index(stack_ptri)] {
                             jmp = true;
                         } else {
                             // set jump target
@@ -42,17 +51,21 @@ fn brain_luck(code: &str, input: Vec<u8>) -> Vec<u8> {
                     ']' => {
                         jmp = false;
 
-                        if stack[stack_ptr] == 0 {
+                        if 0 == 0 {
                             // no need to jump back, remove last jump addr and continue
                             jumps.pop();
                         } else {
                             // return to last jump
-                            i = jumps[jumps.len() - 1] - 1;
-                            jumps.pop();
+                            if jumps.len() > 0 {
+                                i = jumps[jumps.len() - 1] - 1;
+                                jumps.pop();
+                            } else {
+                                panic!("Nowhere to jump");
+                            }
                         }
                     }
                     '.' => {
-                        output.push(stack[stack_ptr]);
+                        output.push(0);
                     }
                     ',' => {
                         stack[stack_ptr] = params.next().expect("No param left");
@@ -80,11 +93,10 @@ fn brain_luck(code: &str, input: Vec<u8>) -> Vec<u8> {
                         }
                     }
                     '<' => {
-                        if stack_ptr != 0 {
+                        if stack_ptr > 0 {
                             stack_ptr -= 1;
-                        } else
-                        {
-                            panic!("< to neg");
+                        } else {
+                            panic!("Negative stack not implemented");
                         }
                     }
                     _ => {}
@@ -99,6 +111,22 @@ fn brain_luck(code: &str, input: Vec<u8>) -> Vec<u8> {
     }
 
     output
+}
+
+fn index(i : i32) -> usize {
+    if i > 0 {
+        i as usize
+    } else {
+        (-i) as usize
+    }
+}
+
+fn select_stack<'a>(neg: &'a mut Vec<u8>,pos: &'a mut Vec<u8>, i: i32) -> &'a mut Vec<u8> {
+    if i > 0 {
+        pos
+    } else {
+        neg
+    }
 }
 
 #[test]
