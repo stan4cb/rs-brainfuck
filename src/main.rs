@@ -29,7 +29,20 @@ fn brain_luck(code: &str, input: Vec<u8>) -> Vec<u8> {
                     println!("");
                 }
             } else {
-                println!("{}::{}", i, op);
+                if let Some(p_op) = code.chars().nth(i + 1) {
+                    match p_op {
+                        '\'' => {
+                            i += 1;
+                            continue;
+                            },
+                        '\"' => {
+                            i += 1;
+                            continue;
+                            },
+                        _ => {}
+                    }
+                }
+                println!("{}:{}", i, op);
                 match op {
                     '[' => {
                         // jump wihtout executing between
@@ -137,18 +150,43 @@ fn hello_world() {
 }
 
 #[test]
+fn hello_world_s() {
+    assert_eq!(
+        brain_luck(
+"++++++++++
+[>+++++++>++++++++++>+++>+<<<<-] The initial loop to set up useful values in the array
+>++.                             Print 'H'
+>+.                              Print 'e'
++++++++.                         Print 'l'
+.                                Print 'l'
++++.                             Print 'o'
+>++.                             Print ' '
+<<+++++++++++++++.               Print 'W'
+>.                               Print 'o'
++++.                             Print 'r'
+------.                          Print 'l'
+--------.                        Print 'd'
+>+.                              Print '!'
+>.                               Print newline",
+            vec![]
+        ),
+        "Hello World!\n".as_bytes()
+    );
+}
+
+#[test]
 fn hello_world_w() {
     assert_eq!(
         brain_luck(
-            "[This program prints 'Hello World!' and a newline to the screen, its
-  length is 106 active command characters. [It is not the shortest.]
+"[This program prints 'Hello World!' and a newline to the screen, its
+  length is 106 active command characters'.' '['It is not the shortest'.']'
 
-  This loop is an 'initial comment loop', a simple way of adding a comment
+  This loop is an 'initial comment loop'',' a simple way of adding a comment
   to a BF program such that you don't have to worry about any command
-  characters. Any '.', ',', '+', '-', '<' and '>' characters are simply
-  ignored, the '[' and ']' characters just have to be balanced. This
+  characters'.' Any '.',' ',',' '+'',' '-'',' '<' and '>' characters are simply
+  ignored',' the '[' and ']' characters just have to be balanced'.' This
   loop and the commands it contains are ignored because the current cell
-  defaults to a value of 0; the 0 value causes this loop to be skipped.
+  defaults to a value of 0; the 0 value causes this loop to be skipped'.'
 ]
 ++++++++               Set Cell #0 to 8
 [
