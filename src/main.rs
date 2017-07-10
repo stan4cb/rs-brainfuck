@@ -1,10 +1,9 @@
 fn main() {
-    println!("{:?}", brain_luck(",>,< [ > [ >+ >+ << -] >> [- << + >>] <<< -] >>.", vec![8, 5]));
+    println!("{:?}", brain_luck(",>,< [ > [ >+ >+ << -] >> [- << + >>] <<< -] >>.", vec![8, 9]));
 }
 
 fn brain_luck(code: &str, input: Vec<u8>) -> Vec<u8> {
     let mut i = 0;
-    let mut io_ptr = 0;
     let mut stack_ptr = 0;
 
     let mut jmp = false;
@@ -12,6 +11,7 @@ fn brain_luck(code: &str, input: Vec<u8>) -> Vec<u8> {
     let mut jumps = vec![];
     let mut stack: Vec<u8> = vec![0];
     let mut output: Vec<u8> = vec![];
+    let mut params = input.into_iter();
 
     loop {
         if let Some(op) = code.chars().nth(i) {
@@ -24,7 +24,7 @@ fn brain_luck(code: &str, input: Vec<u8>) -> Vec<u8> {
                 i += 1;
                 continue;
             }
-            
+
             match op {
                 '[' => {
                     // jump wihtout executing between
@@ -51,8 +51,7 @@ fn brain_luck(code: &str, input: Vec<u8>) -> Vec<u8> {
                     output.push(stack[stack_ptr]);
                 }
                 ',' => {
-                    stack[stack_ptr] = input[io_ptr];
-                    io_ptr += 1;
+                    stack[stack_ptr] = params.next().expect("No param left");
                 }
                 '+' => {
                     if stack[stack_ptr] != 255 {
