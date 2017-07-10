@@ -118,5 +118,5 @@ fn subtract() {
 }
 #[test]
 fn multiply() {
-    assert_eq!(brain_luck(",>,< [ > [ >+ >+ << -] >> [- << + >>] <<< -] >>", vec![8, 3]),  vec![24]);
+    assert_eq!(brain_luck(",>,< [ > [ >+ >+ << -] >> [- << + >>] <<< -] >>.", vec![8, 3]),  vec![24]);
 }
